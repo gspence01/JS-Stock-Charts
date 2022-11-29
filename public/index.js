@@ -4,15 +4,16 @@ async function main() {
     const highestPriceChartCanvas = document.querySelector('#highest-price-chart');
     const averagePriceChartCanvas = document.querySelector('#average-price-chart');
     //let response = await fetch('https://api.twelvedata.com/time_series?symbol=GME,MSFT,DIS,BNTX&interval=1min&apikey=ca4225acb1f64add8d98021463d6e7c7');
-    //let result = await response.json();
     
-
     //below code is for testing, since twelvedata sucks
     const {GME, MSFT, DIS, BNTX} = mockData;
     //const {GME, MSFT, DIS, BNTX} = response;
     const stocks = [GME, MSFT, DIS, BNTX];
-    
 
+    stocks.forEach(stock => stock.values.reverse());
+    
+    
+    //line graph for first stock compilation
     new Chart(timeChartCanvas.getContext('2d'), {
         type: 'line',
         data: {
@@ -25,9 +26,43 @@ async function main() {
             }))
         }
     });
+    //bar graph for highest stock price
+    new Chart(highestPriceChartCanvas.getContext('2d'), {
+        type: 'bar',
+        data:{
+            labels: stocks.map(stock => stock.meta.symbol),
+            datasets: [{
+                label: 'Highest',
+                data: stocks.map(stock=>getHighestPrice(stock)),
+                backgroundColor: stocks.map(stock=>getColor(stock.meta.symbol)),
+                borderColor: stocks.map(stock=>getColor(stock.meta.symbol))
+                
+            }]
+            
+        }
+    })
 
-   
+    
 }
+
+function getHighestPrice(stock){
+    let highestPriceArr = [];
+    for (let i = 0; i<stock.values.length; i++){
+        let stockHigh = parseFloat(stock.values[i].high);
+        highestPriceArr.push(stockHigh)
+    }
+
+    let highestPrice = 0;
+    
+    for (let i = 0; i<highestPriceArr.length; i++){
+        if(highestPrice<highestPriceArr[i]){
+            highestPrice = highestPriceArr[i];
+        }
+    }
+    return highestPrice;
+}
+
+
 
 function getColor(stock){
     if(stock === 'GME'){
