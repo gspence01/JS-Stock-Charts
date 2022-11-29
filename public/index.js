@@ -42,7 +42,37 @@ async function main() {
         }
     })
 
+    //average stock price pie chart
+    new Chart(averagePriceChartCanvas.getContext('2d'), {
+        type: 'pie',
+        data:{
+            labels: stocks.map(stock => stock.meta.symbol),
+            datasets: [{
+                label: 'Highest',
+                data: stocks.map(stock=>getAveragePrice(stock)),
+                backgroundColor: stocks.map(stock=>getColor(stock.meta.symbol)),
+                borderColor: stocks.map(stock=>getColor(stock.meta.symbol))
+                
+            }]
+            
+        }
+    })
     
+}
+
+function getAveragePrice(stock){
+    let avPriceArr = [];
+    for (let i = 0; i<stock.values.length; i++){
+        let stockHigh = parseFloat(stock.values[i].high);
+        avPriceArr.push(stockHigh)
+    }
+
+    let priceSum = 0;
+    for (let i = 0; i<avPriceArr.length; i++){
+        priceSum+=avPriceArr[i];
+    }
+
+    return priceSum/avPriceArr.length;
 }
 
 function getHighestPrice(stock){
